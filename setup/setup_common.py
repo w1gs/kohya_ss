@@ -229,9 +229,9 @@ def install_requirements_inbulk(requirements_file, show_stdout=True, optional_pa
         optional_parm += " -U"
 
     if show_stdout:
-        run_cmd(f'pip install -r {requirements_file} {optional_parm}')
+        run_cmd(f'python -m pip install -r {requirements_file} {optional_parm}')
     else:
-        run_cmd(f'pip install -r {requirements_file} {optional_parm} --quiet')
+        run_cmd(f'python -m pip install -r {requirements_file} {optional_parm} --quiet')
     log.info(f'Requirements from {requirements_file} installed.')
     
 
