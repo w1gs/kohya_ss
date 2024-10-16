@@ -103,8 +103,8 @@ get_distro_name() {
     line=${line##*=}
     echo "$line"
     return 0
-  elif command -v python >/dev/null; then
-    line="$(python -mplatform)"
+  elif command -v python3 >/dev/null; then
+    line="$(python3 -mplatform)"
     echo "$line"
     return 0
   elif command -v python3 >/dev/null; then
@@ -182,19 +182,19 @@ create_symlinks() {
   fi
 }
 
-# Function to install Python dependencies
+# Function to install python3 dependencies
 install_python_dependencies() {
   local TEMP_REQUIREMENTS_FILE
 
   # Switch to local virtual env
-  echo "Switching to virtual Python environment."
+  echo "Switching to virtual python3 environment."
   if ! inDocker; then
-    if command -v python >/dev/null; then
+    if command -v python3 >/dev/null; then
       	echo 'Skipping venv create'
 	#python3.10 -m venv "$DIR/.venv"
     else
       echo "Valid python3 or python3.10 binary not found."
-      echo "Cannot proceed with the python steps."
+      echo "Cannot proceed with the python3 steps."
       return 1
     fi
 
@@ -205,30 +205,30 @@ install_python_dependencies() {
   case "$OSTYPE" in
     "lin"*)
       if [ "$RUNPOD" = true ]; then
-        python "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_runpod.txt
+        python3 "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_runpod.txt
       elif [ "$USE_IPEX" = true ]; then
-        python "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_linux_ipex.txt
+        python3 "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_linux_ipex.txt
       elif [ "$USE_ROCM" = true ] || [ -x "$(command -v rocminfo)" ] || [ -f "/opt/rocm/bin/rocminfo" ]; then
-        python "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_linux_rocm.txt
+        python3 "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_linux_rocm.txt
       else
-        python "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_linux.txt
+        python3 "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_linux.txt
       fi
       ;;
     "darwin"*)
       if [[ "$(uname -m)" == "arm64" ]]; then
-        python "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_macos_arm64.txt
+        python3 "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_macos_arm64.txt
       else
-        python "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_macos_amd64.txt
+        python3 "$SCRIPT_DIR/setup/setup_linux.py" --platform-requirements-file=requirements_macos_amd64.txt
       fi
       ;;
   esac
 
   if [ -n "$VIRTUAL_ENV" ] && ! inDocker; then
     if command -v deactivate >/dev/null; then
-      echo "Exiting Python virtual environment."
+      echo "Exiting python3 virtual environment."
       deactivate
     else
-      echo "deactivate command not found. Could still be in the Python virtual environment."
+      echo "deactivate command not found. Could still be in the python3 virtual environment."
     fi
   fi
 }
@@ -467,7 +467,7 @@ if [[ "$OSTYPE" == "lin"* ]]; then
       #   exit 1
       # fi
     else
-      echo "Python TK found..."
+      echo "python3 TK found..."
     fi
   elif "$distro" | grep -Eqi "Fedora|CentOS|Redhat"; then
     echo "Redhat or Redhat base detected."
@@ -481,7 +481,7 @@ if [[ "$OSTYPE" == "lin"* ]]; then
       #   exit 1
       # fi
     else
-      echo "Python TK found..."
+      echo "python3 TK found..."
     fi
   elif "$distro" | grep -Eqi "arch" || "$family" | grep -qi "arch"; then
     echo "Arch Linux or Arch base detected."
@@ -495,7 +495,7 @@ if [[ "$OSTYPE" == "lin"* ]]; then
       #   exit 1
       # fi
     else
-      echo "Python TK found..."
+      echo "python3 TK found..."
     fi
   elif "$distro" | grep -Eqi "opensuse" || "$family" | grep -qi "opensuse"; then
     echo "OpenSUSE detected."
@@ -509,7 +509,7 @@ if [[ "$OSTYPE" == "lin"* ]]; then
       #   exit 1
       # fi
     else
-      echo "Python TK found..."
+      echo "python3 TK found..."
     fi
   elif [ "$distro" = "None" ] || [ "$family" = "None" ]; then
     if [ "$distro" = "None" ]; then
@@ -526,8 +526,8 @@ if [[ "$OSTYPE" == "lin"* ]]; then
   # We need just a little bit more setup for non-interactive environments
   if [ "$RUNPOD" = true ]; then
     if inDocker; then
-      # We get the site-packages from python itself, then cut the string, so no other code changes required.
-      VENV_DIR=$(python -c "import site; print(site.getsitepackages()[0])")
+      # We get the site-packages from python3 itself, then cut the string, so no other code changes required.
+      VENV_DIR=$(python3 -c "import site; print(site.getsitepackages()[0])")
       VENV_DIR="${VENV_DIR%/lib/python3.10/site-packages}"
     fi
 
@@ -599,20 +599,20 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
   check_storage_space
 
-  # Install base python packages
-  echo "Installing Python 3.10 if not found."
+  # Install base python3 packages
+  echo "Installing python3 3.10 if not found."
   if ! brew ls --versions python@3.10 >/dev/null; then
-    echo "Installing Python 3.10."
+    echo "Installing python3 3.10."
     brew install python@3.10 >&3
   else
-    echo "Python 3.10 found!"
+    echo "python3 3.10 found!"
   fi
   echo "Installing Python-TK 3.10 if not found."
   if ! brew ls --versions python-tk@3.10 >/dev/null; then
-    echo "Installing Python TK 3.10."
+    echo "Installing python3 TK 3.10."
     brew install python-tk@3.10 >&3
   else
-    echo "Python Tkinter 3.10 found!"
+    echo "python3 Tkinter 3.10 found!"
   fi
 
   update_kohya_ss
